@@ -8,4 +8,10 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Account
         fields = ['email', 'username', 'first_name', 'last_name', 'is_seller', 'date_joined']
 
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+
+
     
