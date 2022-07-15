@@ -42,7 +42,8 @@ THIRD_PARTY_APPS = [
 ]
 
 MY_APPS = [ 
-    'accounts'
+    'accounts',
+    'products'
 ]
 
 
