@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from rest_framework import generics
-
 from products.models import Product
 from products.serializers import CreateProductSerializer, ListProductSerializer
 from rest_framework.authentication import TokenAuthentication
@@ -19,3 +18,13 @@ class ListCreateProductView(SerializerByMethodMixin, generics.ListCreateAPIView)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class RetrievePatchProductView(SerializerByMethodMixin, generics.RetrieveUpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsOwnerOrAdminOrReadOnly]
+
+    queryset = Product.objects.all()
+    serializer_map = {
+        "PATCH": CreateProductSerializer,
+        "GET": ListProductSerializer
+    }
