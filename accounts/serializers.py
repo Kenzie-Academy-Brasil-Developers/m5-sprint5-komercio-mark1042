@@ -17,6 +17,11 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
+class AccountUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['email', 'first_name', 'last_name', 'is_seller']
+
 
 
     
