@@ -14,7 +14,7 @@ class AccountModelTest(TestCase):
     
     def test_username_should_be_null(self):
         account = Account.objects.get(id=1)
-        self.assertEquals(account.username, None)
+        self.assertIsNone(account.username)
     
     def test_first_name_max_length(self):
         account = Account.objects.get(id=1)
