@@ -23,5 +23,12 @@ class AccountUpdateSerializer(serializers.ModelSerializer):
         fields = ['email', 'first_name', 'last_name', 'is_seller']
 
 
+class ToggleIsActiveSerializer(serializers.ModelSerializer): 
+    class Meta:
+        model = Account
+        all_fields = ['id', 'email', 'first_name', 'last_name', 'is_seller', 'date_joined', 'is_active']
+        fields = all_fields
+        read_only_fields = all_fields[:-1]
+        
 
     

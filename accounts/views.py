@@ -5,8 +5,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 
 from accounts.models import Account
-from accounts.serializers import AccountSerializer, LoginSerializer, AccountUpdateSerializer
-from komercio.permissions import IsAccountOwner
+from accounts.serializers import AccountSerializer, LoginSerializer, AccountUpdateSerializer, ToggleIsActiveSerializer
+from komercio.permissions import IsAccountOwner, IsSuperUser
 
 
 class ListCreateAccountView(generics.ListCreateAPIView):
@@ -40,3 +40,8 @@ class UpdateAccountView(generics.UpdateAPIView):
     serializer_class = AccountUpdateSerializer
     queryset = Account.objects.all()
 
+class ToggleIsActiveView(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSuperUser]
+    serializer_class = ToggleIsActiveSerializer
+    queryset = Account.objects.all()
