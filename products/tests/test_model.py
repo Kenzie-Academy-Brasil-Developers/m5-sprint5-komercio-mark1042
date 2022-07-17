@@ -27,6 +27,8 @@ class ProductModelTest(TestCase):
     def test_user_value(self):
         self.assertEquals(self.product.user, self.account)
         self.assertEquals(self.product_2.user, self.account)
+        self.assertIsInstance(self.product.user, Account)
+        self.assertIsInstance(self.product_2.user, Account)
     
     def test_user_may_have_multiple_products(self):
         self.assertEquals(self.account.products.count(), len(self.prodx))
