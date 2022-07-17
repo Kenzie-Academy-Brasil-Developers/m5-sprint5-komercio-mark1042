@@ -53,7 +53,7 @@ class TestProductView(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
     
     def test_anyone_can_retrieve_products(self):
-        res = res = self.client.get(f'/api/products/{self.product.id}/')
+        res = self.client.get(f'/api/products/{self.product.id}/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
     
     def test_create_product_response(self):
@@ -64,6 +64,17 @@ class TestProductView(APITestCase):
         self.assertIn('email', res.data['user'].keys())
         self.assertIn('first_name', res.data['user'].keys())
         self.assertIn('last_name', res.data['user'].keys())
+    
+    def test_get_product_response(self):
+        res = self.client.get(f'/api/products/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotIn('id', res.data[0].keys())
+        self.assertIn('description', res.data[0].keys())
+        self.assertIn('price', res.data[0].keys())
+        self.assertIn('quantity', res.data[0].keys())
+        self.assertIn('is_active', res.data[0].keys())
+        self.assertIn('user', res.data[0].keys())
+
         
 
 
