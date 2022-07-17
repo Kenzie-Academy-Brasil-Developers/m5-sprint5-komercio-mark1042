@@ -48,6 +48,12 @@ class TestAccountView(APITestCase):
         res = self.client.post('/api/login/', data=self.seller)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(new_seller.auth_token.key, res.data['token'])
+        
+    def test_not_seller_login_token(self):
+        not_seller_ = Account.objects.create_user(**self.not_seller)
+        res = self.client.post('/api/login/', data=self.not_seller)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(not_seller_.auth_token.key, res.data['token'])
     
     
     
