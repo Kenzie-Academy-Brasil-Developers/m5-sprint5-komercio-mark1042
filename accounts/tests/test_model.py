@@ -5,7 +5,7 @@ from accounts.models import Account
 class AccountModelTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        Account.objects.create(email='testin123@test.com', first_name='Testin', last_name='McTestinson', password='1234', is_seller=True)
+        Account.objects.create_user(email='testin123@test.com', first_name='Testin', last_name='McTestinson', password='1234', is_seller=True)
 
     def test_email_max_length(self):
         account = Account.objects.get(id=1)
