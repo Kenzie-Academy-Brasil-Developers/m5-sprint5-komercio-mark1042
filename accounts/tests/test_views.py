@@ -7,8 +7,11 @@ class TestAccountView(APITestCase):
     def setUpTestData(cls) -> None:
         cls.seller = {'email': 'seller@mail.com', 'first_name': 'seller', 'last_name': 'seller', 'password': '1234', 'is_seller': True}
 
-    
-
+    def test_create_seller(self):
+        res = self.client.post('/api/accounts/', data=self.seller)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(res.data['is_seller'], True)
+        self.assertNotIn('password', res.data)
 
 
 
