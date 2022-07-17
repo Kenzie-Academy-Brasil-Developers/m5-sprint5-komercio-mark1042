@@ -113,6 +113,7 @@ class TestAccountView(APITestCase):
     def test_anyone_can_list_accounts(self):
         res = self.client.get('/api/accounts/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
         
 
 
@@ -129,7 +130,6 @@ class TestAccountView(APITestCase):
     
     
     
-
 
 
 
