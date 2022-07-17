@@ -27,13 +27,23 @@ class TestAccountView(APITestCase):
         res = self.client.post('/api/accounts/', data={'first_name': 'test', 'last_name': 'test'})
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('email', res.data)
-        self.assertEqual(res.json()['email'][0], self.field_required_msg)
+        self.assertEqual(str(res.data['email'][0]), self.field_required_msg)
         self.assertIn('password', res.data)
-        self.assertEqual(res.json()['password'][0], self.field_required_msg)
+        self.assertEqual(str(res.data['password'][0]), self.field_required_msg)
         self.assertNotIn('first_name', res.data)
         self.assertNotIn('last_name', res.data)
     
-    def test_seller_login(self):
+    def test_create_not_seller_missing_keys(self):
+        res = self.client.post('/api/accounts/', data={'email': 'test@mail.com', 'password': '1234'})
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('first_name', res.data)
+        self.assertEqual(str(res.data['first_name'][0]), self.field_required_msg)
+        self.assertIn('last_name', res.data)
+        self.assertEqual(str(res.data['last_name'][0]), self.field_required_msg)
+        self.assertNotIn('email', res.data)
+        self.assertNotIn('password', res.data)
+
+    def test_seller_login_token(self):
         new_seller = Account.objects.create_user(**self.seller)
         res = self.client.post('/api/login/', data=self.seller)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
