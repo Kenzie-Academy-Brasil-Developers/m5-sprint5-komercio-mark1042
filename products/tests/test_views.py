@@ -56,6 +56,14 @@ class TestProductView(APITestCase):
         res = res = self.client.get(f'/api/products/{self.product.id}/')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
     
+    def test_create_product_response(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.seller_token.key)
+        res = self.client.post('/api/products/', data=self.product_data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertIn('id' , res.data['user'].keys())
+        self.assertIn('email', res.data['user'].keys())
+        self.assertIn('first_name', res.data['user'].keys())
+        self.assertIn('last_name', res.data['user'].keys())
         
 
 
