@@ -2,7 +2,6 @@ from rest_framework.test import APITestCase
 from rest_framework.views import status
 from accounts.models import Account
 from rest_framework.authtoken.models import Token
-
 from products.models import Product
 
 
@@ -27,6 +26,8 @@ class TestProductView(APITestCase):
 
         cls.product = Product.objects.create(**cls.product_data)
         cls.other_product = Product.objects.create(**cls.other_product_data)
+
+        cls.required_msg = 'This field is required.'
 
     def test_only_seller_can_create_product(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.seller_token.key)
@@ -74,6 +75,20 @@ class TestProductView(APITestCase):
         self.assertIn('quantity', res.data[0].keys())
         self.assertIn('is_active', res.data[0].keys())
         self.assertIn('user', res.data[0].keys())
+    
+    def test_product_missing_keys(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.seller_token.key)
+        res = self.client.post('/api/products/', data={})
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('description', res.data)
+        self.assertIn('price', res.data)
+        self.assertIn('quantity', res.data)
+        self.assertEqual(res.data['description'][0], self.required_msg)
+
+
+
+    
+
 
         
 
