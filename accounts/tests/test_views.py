@@ -8,6 +8,7 @@ class TestAccountView(APITestCase):
         cls.seller = {'email': 'seller@mail.com', 'first_name': 'seller', 'last_name': 'seller', 'password': '1234', 'is_seller': True}
         cls.not_seller = {'email': 'notseller@mail.com', 'first_name': 'not', 'last_name': 'seller', 'password': '1234', 'is_seller': False}
         cls.field_required_msg = 'This field is required.'
+
     def test_create_seller(self):
         res = self.client.post('/api/accounts/', data=self.seller)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -31,10 +32,19 @@ class TestAccountView(APITestCase):
         self.assertEqual(res.json()['password'][0], self.field_required_msg)
         self.assertNotIn('first_name', res.data)
         self.assertNotIn('last_name', res.data)
+    
+    def test_seller_login(self):
+        new_seller = Account.objects.create_user(**self.seller)
+        res = self.client.post('/api/login/', data=self.seller)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(new_seller.auth_token.key, res.data['token'])
+    
+    
+    
 
 
 
 
 
-        # cls.seller = Account.objects.create_user(email='seller@mail.com', first_name='seller', last_name='mcseller', password='1234', is_seller=True)
-        # cls.notseller = Account.objects.create_user(email='notseller@mail.com', first_name='not', last_name='seller', password='1234', is_seller=False)
+
+    
