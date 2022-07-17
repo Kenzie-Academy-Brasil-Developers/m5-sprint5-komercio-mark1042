@@ -30,3 +30,7 @@ class ProductModelTest(TestCase):
     def test_user_may_have_multiple_products(self):
         self.assertEquals(self.account.products.count(), len(self.prodx))
     
+    def test_account_products_values(self):
+        for product in self.account.products.all():
+            self.assertIn(product, self.account.products.all())
+    
