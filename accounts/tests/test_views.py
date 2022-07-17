@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework.views import status
 from accounts.models import Account
+from rest_framework.authtoken.models import Token
 
 class TestAccountView(APITestCase):
     @classmethod
@@ -8,6 +9,7 @@ class TestAccountView(APITestCase):
         cls.seller = {'email': 'seller@mail.com', 'first_name': 'seller', 'last_name': 'seller', 'password': '1234', 'is_seller': True}
         cls.not_seller = {'email': 'notseller@mail.com', 'first_name': 'not', 'last_name': 'seller', 'password': '1234', 'is_seller': False}
         cls.field_required_msg = 'This field is required.'
+        cls.forbidden_msg = 'You do not have permission to perform this action.'
 
     def test_create_seller(self):
         res = self.client.post('/api/accounts/', data=self.seller)
@@ -54,6 +56,27 @@ class TestAccountView(APITestCase):
         res = self.client.post('/api/login/', data=self.not_seller)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(not_seller_.auth_token.key, res.data['token'])
+    
+    def test_only_account_owner_can_patch(self):
+        update_data = {'first_name': 'PATCH'}
+        seller_ = Account.objects.create_user(**self.seller)
+        not_seller_ = Account.objects.create_user(**self.not_seller)
+
+        seller_token = Token.objects.create(user=seller_)
+        
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + seller_token.key)
+        res = self.client.patch(f'/api/accounts/{not_seller_.id}/', data=update_data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.data['detail'], self.forbidden_msg)
+
+        res = self.client.patch(f'/api/accounts/{seller_.id}/', data=update_data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['first_name'], 'PATCH')
+
+
+        
+
+
     
     
     
