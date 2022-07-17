@@ -11,12 +11,14 @@ class TestAccountView(APITestCase):
     def test_create_seller(self):
         res = self.client.post('/api/accounts/', data=self.seller)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data['first_name'], 'seller')
         self.assertTrue(res.data['is_seller'])
         self.assertNotIn('password', res.data)
     
     def test_create_not_seller(self):
         res = self.client.post('/api/accounts/', data=self.not_seller)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data['first_name'], 'not')
         self.assertFalse(res.data['is_seller'])
         self.assertNotIn('password', res.data)
 
