@@ -78,6 +78,7 @@ class TestAccountView(APITestCase):
         update_data = {'is_active': False}
         admin = Account.objects.create_superuser(**self.admin)
         seller_ = Account.objects.create_user(**self.seller)
+        self.assertTrue(admin.is_superuser)
         
         seller_token = Token.objects.create(user=seller_)
         admin_token = Token.objects.create(user=admin)
@@ -92,6 +93,26 @@ class TestAccountView(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('is_active', res.data)
         self.assertFalse(res.data['is_active'])
+    
+    def test_only_admin_can_reactivate(self):
+        update_data = {'is_active': True}
+        admin = Account.objects.create_superuser(**self.admin)
+        seller_ = Account.objects.create_user(**self.seller)
+        self.assertTrue(admin.is_superuser)
+
+        admin_token = Token.objects.create(user=admin)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + admin_token.key)
+        res = self.client.patch(f'/api/accounts/{seller_.id}/management/', data={'is_active': False})
+        self.assertFalse(res.data['is_active'])
+        res = self.client.patch(f'/api/accounts/{seller_.id}/management/', data=update_data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('is_active', res.data)
+        self.assertTrue(res.data['is_active'])
+        
+
+
+
 
 
 
