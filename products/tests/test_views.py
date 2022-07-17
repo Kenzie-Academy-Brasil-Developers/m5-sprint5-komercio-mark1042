@@ -16,4 +16,18 @@ class TestProductView(APITestCase):
         cls.seller_token = Token.objects.create(user=cls.seller)
         cls.not_seller_token = Token.objects.create(user=cls.not_seller)
 
+        cls.product_data = {'description': 'test desc', 'price': 10, 'quantity': 1, 'user': cls.seller }
+
+    def test_only_seller_can_create_product(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.seller_token.key)
+        res = self.client.post('/api/products/', data=self.product_data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+    
+    def test_only_seller_can_create_product_fail(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.not_seller_token.key)
+        res = self.client.post('/api/products/', data=self.product_data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         
+
+
+
