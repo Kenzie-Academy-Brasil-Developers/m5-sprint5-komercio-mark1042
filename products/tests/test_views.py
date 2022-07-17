@@ -47,6 +47,15 @@ class TestProductView(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.other_seller_token.key)
         res = self.client.patch(f'/api/products/{self.product.id}/', data=self.update_product_data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+    
+    def test_anyone_can_list_products(self):
+        res = self.client.get('/api/products/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
+    def test_anyone_can_retrieve_products(self):
+        res = res = self.client.get(f'/api/products/{self.product.id}/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+    
         
 
 
