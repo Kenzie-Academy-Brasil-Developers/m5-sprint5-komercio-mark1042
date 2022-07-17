@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework.test import APITestCase
 from rest_framework.views import status
 from accounts.models import Account
@@ -21,7 +22,7 @@ class TestProductView(APITestCase):
         cls.not_seller_token = Token.objects.create(user=cls.not_seller)
 
         cls.product_data = {'description': 'test desc', 'price': 10, 'quantity': 1, 'user': cls.seller}
-        cls.other_product_data = {'description': 'test desc', 'price': 10, 'quantity': 1, 'user': cls.not_seller}
+        cls.other_product_data = {'description': 'test desc', 'price': 10, 'quantity': 1, 'user': cls.other_seller}
         cls.update_product_data = {'description': 'test update'}
 
         cls.product = Product.objects.create(**cls.product_data)
@@ -84,6 +85,18 @@ class TestProductView(APITestCase):
         self.assertIn('price', res.data)
         self.assertIn('quantity', res.data)
         self.assertEqual(res.data['description'][0], self.required_msg)
+    
+    def test_product_with_negative_qty(self):
+        try:
+            ngtv_qty_data = {'description': 'test desc', 'price': 10, 'quantity': -1, 'user': self.seller}
+            self.client.credentials(HTTP_AUTHORIZATION="Token " + self.seller_token.key)
+            res = self.client.post('/api/products/', data=ngtv_qty_data)
+        except IntegrityError as err:
+            self.assertEqual(IntegrityError, type(err))
+            self.assertTrue('CHECK constraint failed' in str(err))
+
+        
+
 
 
 
