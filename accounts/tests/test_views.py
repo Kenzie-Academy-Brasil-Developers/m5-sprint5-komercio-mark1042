@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 class TestAccountView(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
+        cls.admin = {'email': 'admin@mail.com', 'first_name': 'admin', 'last_name': 'admin', 'password': '1234'}
         cls.seller = {'email': 'seller@mail.com', 'first_name': 'seller', 'last_name': 'seller', 'password': '1234', 'is_seller': True}
         cls.not_seller = {'email': 'notseller@mail.com', 'first_name': 'not', 'last_name': 'seller', 'password': '1234', 'is_seller': False}
         cls.field_required_msg = 'This field is required.'
@@ -72,6 +73,29 @@ class TestAccountView(APITestCase):
         res = self.client.patch(f'/api/accounts/{seller_.id}/', data=update_data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data['first_name'], 'PATCH')
+    
+    def test_only_admin_can_deactivate(self):
+        update_data = {'is_active': False}
+        admin = Account.objects.create_superuser(**self.admin)
+        seller_ = Account.objects.create_user(**self.seller)
+        
+        seller_token = Token.objects.create(user=seller_)
+        admin_token = Token.objects.create(user=admin)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + seller_token.key)
+        res = self.client.patch(f'/api/accounts/{seller_.id}/management/', data=update_data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.data['detail'], self.forbidden_msg)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + admin_token.key)
+        res = self.client.patch(f'/api/accounts/{seller_.id}/management/', data=update_data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('is_active', res.data)
+        self.assertFalse(res.data['is_active'])
+
+
+
+
 
 
         
